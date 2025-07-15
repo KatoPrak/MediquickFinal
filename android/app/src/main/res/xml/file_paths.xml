@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Direktori cache untuk gambar -->
+    <cache-path name="cache_images" path="images/"/>
+    
+    <!-- Direktori eksternal (SD Card) -->
+    <external-path name="external_images" path="Pictures/"/>
+    
+    <!-- Direktori files di dalam storage internal aplikasi -->
+    <files-path name="files_images" path="images/"/>
+    
+    <!-- Direktori root eksternal -->
+    <external-path name="external" path="."/>
+    
+    <!-- Direktori root cache eksternal -->
+    <external-cache-path name="external_cache" path="."/>
+    
+    <!-- Direktori root files eksternal -->
+    <external-files-path name="external_files" path="."/>
+</paths>
