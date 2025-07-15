@@ -96,7 +96,7 @@ class _ApotekHeaderState extends State<ApotekHeader> {
                           builder: (_) => const NotificationsScreen(),
                         ),
                       );
-                      loadUnreadCount(); // ✅ Refresh setelah kembali
+                      loadUnreadCount();
                     },
                   ),
                   if (unreadCount > 0)
