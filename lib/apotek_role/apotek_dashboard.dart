@@ -57,21 +57,48 @@ class _ApotekDashboardScreenState extends State<ApotekDashboardScreen> {
 
   Future<void> _updateStatus(String newStatus) async {
     final prefs = await SharedPreferences.getInstance();
-    final id = prefs.getString('id');
+    final apotekProfileId = prefs.getString('apotek_profile_id');
 
-    final response = await http.post(
-      Uri.parse('http://mediquick.my.id/users/update_status.php'),
-      body: {'id': id, 'status': newStatus},
-    );
-
-    final result = jsonDecode(response.body);
-    if (result['success']) {
-      setState(() {
-        status = newStatus;
-      });
-    } else {
-      debugPrint(result['message']);
+    if (apotekProfileId == null || apotekProfileId.isEmpty) {
+      debugPrint('❌ apotek_profile_id tidak ditemukan di SharedPreferences');
+      _showSnackbar('Gagal mengubah status: ID apotek tidak ditemukan');
+      return;
     }
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://mediquick.my.id/users/update_status.php'),
+        body: {'id': apotekProfileId, 'status': newStatus},
+      );
+
+      if (response.statusCode == 200) {
+        final result = jsonDecode(response.body);
+
+        if (result['success']) {
+          setState(() {
+            status = newStatus;
+          });
+          debugPrint('✅ Status berhasil diubah ke $newStatus');
+          _showSnackbar('Status berhasil diperbarui');
+        } else {
+          debugPrint('❌ Gagal update status: ${result['message']}');
+          _showSnackbar('Gagal update status: ${result['message']}');
+        }
+      } else {
+        debugPrint('❌ HTTP ${response.statusCode}');
+        _showSnackbar('Terjadi kesalahan server');
+      }
+    } catch (e) {
+      debugPrint('❌ Exception: $e');
+      _showSnackbar('Tidak dapat terhubung ke server');
+    }
+  }
+
+  void _showSnackbar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _loadLowStock() async {
@@ -188,15 +215,28 @@ class _ApotekDashboardScreenState extends State<ApotekDashboardScreen> {
                     color: Colors.teal,
                     onTap: () async {
                       final prefs = await SharedPreferences.getInstance();
-                      final id = prefs.getString('id');
-                      if (id != null) {
+                      final profileIdString = prefs.getString(
+                        'apotek_profile_id',
+                      );
+                      final apotekProfileId =
+                          int.tryParse(profileIdString ?? '') ?? 0;
+
+                      if (apotekProfileId != 0) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder:
-                                (context) => ApotekChatListScreen(
-                                  apotekId: int.parse(id),
-                                ),
+                            builder: (context) => ApotekChatListScreen(),
+                          ),
+                        );
+                      } else {
+                        debugPrint(
+                          '❌ apotek_profile_id tidak ditemukan di SharedPreferences',
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Gagal membuka daftar chat: ID apotek tidak valid',
+                            ),
                           ),
                         );
                       }
