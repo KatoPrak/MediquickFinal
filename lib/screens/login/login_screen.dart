@@ -111,6 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
               }),
             )
             .timeout(const Duration(seconds: 10));
+        print("Raw response body: ${response.body}");
 
         final dynamic data = jsonDecode(response.body);
 
