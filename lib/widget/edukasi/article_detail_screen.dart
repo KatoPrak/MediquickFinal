@@ -28,13 +28,18 @@ class ArticleDetailScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 200,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  width: double.infinity,
-                  height: 200,
-                  color: Colors.grey[300],
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.broken_image, size: 80, color: Colors.grey),
-                ),
+                errorBuilder:
+                    (context, error, stackTrace) => Container(
+                      width: double.infinity,
+                      height: 200,
+                      color: Colors.grey[300],
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 80,
+                        color: Colors.grey,
+                      ),
+                    ),
               ),
             ),
             const SizedBox(height: 16),
@@ -67,7 +72,9 @@ class ArticleDetailScreen extends StatelessWidget {
                     await launchUrl(uri, mode: LaunchMode.externalApplication);
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Tidak bisa membuka link video")),
+                      const SnackBar(
+                        content: Text("Tidak bisa membuka link video"),
+                      ),
                     );
                   }
                 },
@@ -75,8 +82,8 @@ class ArticleDetailScreen extends StatelessWidget {
                   article.videoUrl,
                   style: const TextStyle(color: Colors.blue),
                 ),
-              )
-            ]
+              ),
+            ],
           ],
         ),
       ),

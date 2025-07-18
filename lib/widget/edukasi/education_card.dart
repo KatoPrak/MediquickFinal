@@ -1,4 +1,3 @@
-// widget/edukasi/education_card.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mediquick/admin/model/article_model.dart';
@@ -11,6 +10,8 @@ class EducationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -24,9 +25,11 @@ class EducationCard extends StatelessWidget {
         color: const Color(0xFF88A9D3),
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        margin: const EdgeInsets.only(bottom: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Gambar artikel di bagian atas card
             ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(16),
@@ -35,35 +38,44 @@ class EducationCard extends StatelessWidget {
               child: Image.network(
                 article.imageUrl,
                 fit: BoxFit.cover,
-                height: 150,
+                height: screenWidth * 0.3,
                 width: double.infinity,
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  Icons.broken_image,
-                  size: 100,
-                  color: Colors.grey,
-                ),
+                errorBuilder:
+                    (context, error, stackTrace) => const Icon(
+                      Icons.broken_image,
+                      size: 80,
+                      color: Colors.grey,
+                    ),
               ),
             ),
+
+            // Bagian isi card (judul, penulis, tanggal)
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Judul artikel
                   Text(
                     article.title,
                     style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
+
+                  // Nama penulis
                   Text(
                     article.author,
                     style: const TextStyle(fontSize: 13, color: Colors.white70),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
+
+                  // Tanggal publikasi
                   Text(
                     _formatDate(article.publishedDate),
                     style: const TextStyle(fontSize: 12, color: Colors.white70),

@@ -1,4 +1,3 @@
-// widget/dashboard/category_section.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -214,7 +213,7 @@ class _CategorySectionState extends State<CategorySection> {
       ],
     );
   }
- 
+
   Widget sectionTitle(String title) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

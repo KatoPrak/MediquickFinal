@@ -59,10 +59,57 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
       builder:
           (context, player) => Scaffold(
             backgroundColor: const Color(0xFFF5F6FA),
-            appBar: AppBar(
-              title: Text(widget.title),
-              backgroundColor: Colors.blueAccent,
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(80),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color(0xFF7FA1C3),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            // Tombol Back
+                            IconButton(
+                              icon: const Icon(
+                                Icons.arrow_back,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            const SizedBox(width: 8),
+
+                            // Logo
+                            Image.asset('assets/images/logo.png', height: 50),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
+
             body: SingleChildScrollView(
               child: Column(
                 children: [
@@ -93,7 +140,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
                         Text(
                           widget.title,
                           style: const TextStyle(
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF2D3142),
                           ),
@@ -156,7 +203,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
                                 horizontal: 24,
                                 vertical: 12,
                               ),
-                              backgroundColor: Colors.blueAccent,
+                              backgroundColor: Color(0xFF7FA1C3),
                               foregroundColor: Colors.white,
                               textStyle: const TextStyle(fontSize: 16),
                               shape: RoundedRectangleBorder(

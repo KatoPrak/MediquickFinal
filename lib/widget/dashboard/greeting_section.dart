@@ -1,10 +1,9 @@
-// widget/dashboard/greeting_section.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mediquick/screens/login/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/services.dart'; // Optional, untuk SystemNavigator.pop() jika ingin keluar aplikasi
+import 'package:flutter/services.dart';
 
 class User {
   final String name;
@@ -66,7 +65,7 @@ class _GreetingSectionState extends State<GreetingSection> {
         });
       }
     } catch (e) {
-      if (!mounted) return; // Cegah error jika widget sudah disposed
+      if (!mounted) return;
       setState(() {
         errorMessage = 'Terjadi error: $e';
         isLoading = false;
