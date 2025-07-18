@@ -183,33 +183,6 @@ class _GreetingSectionState extends State<GreetingSection> {
               icon: const Icon(Icons.settings, color: Color(0xFF6482AD)),
               onPressed: _showSettingsMenu,
             ),
-            IconButton(
-              icon: const Icon(Icons.logout, color: Color(0xFF6482AD)),
-              onPressed: () async {
-                final confirm = await showDialog(
-                  context: context,
-                  builder:
-                      (_) => AlertDialog(
-                        title: const Text("Logout"),
-                        content: const Text("Apakah Anda yakin ingin keluar?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text("Batal"),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text("Logout"),
-                          ),
-                        ],
-                      ),
-                );
-
-                if (confirm == true) {
-                  _logout();
-                }
-              },
-            ),
           ],
         ),
       ],
