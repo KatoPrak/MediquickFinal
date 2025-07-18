@@ -23,9 +23,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Future<void> _validateAndRegister() async {
     if (_formKey.currentState!.validate()) {
-      final url = Uri.parse(
-        "http://mediquick.my.id/add_users.php",
-      );
+      final url = Uri.parse("https://mediquick.my.id/add_users.php");
+
       try {
         final response = await http.post(
           url,
@@ -37,29 +36,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
             "name": _nameController.text.trim(),
             "email": _emailController.text.trim(),
             "password": _passwordController.text.trim(),
+            "role": "user",
           }),
         );
 
-        print("Status Code: ${response.statusCode}");
-        print("Response Body: ${response.body}");
-
-        if (response.body.isEmpty) {
-          throw Exception("Respons dari server kosong.");
-        }
-
         final data = jsonDecode(response.body);
+        print("Status: ${response.statusCode}");
+        print("Response: $data");
 
-        if (response.statusCode == 201) {
-          _showSuccessDialog();
+        if (data['status'] == "success") {
+          _showSuccessDialog(); // tampilkan dialog sukses
         } else {
+          // tampilkan error sebenarnya
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Error: ${data['message']}')));
+          ).showSnackBar(SnackBar(content: Text('❌ ${data['message']}')));
         }
       } catch (e) {
+        // kesalahan di sisi Flutter
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+        ).showSnackBar(SnackBar(content: Text('❌ Terjadi kesalahan: $e')));
       }
     }
   }

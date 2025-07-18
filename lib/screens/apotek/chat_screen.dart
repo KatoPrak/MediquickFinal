@@ -129,7 +129,10 @@ class _ChatScreenState extends State<ChatScreen> {
         await loadMessages();
         scrollToBottom();
       } else {
-        debugPrint('❌ Gagal kirim pesan: ${data['message']}');
+        print('❌ Gagal kirim pesan: ${data['message']}');
+        if (data['error'] != null) {
+          print('🧨 Error detail: ${data['error']}');
+        }
       }
     } catch (e) {
       debugPrint('❌ Exception sendMessage: $e');
