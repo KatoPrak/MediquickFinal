@@ -56,43 +56,47 @@ class _ApotekDashboardScreenState extends State<ApotekDashboardScreen> {
   }
 
   Future<void> _updateStatus(String newStatus) async {
-    final prefs = await SharedPreferences.getInstance();
-    final apotekProfileId = prefs.getString('apotek_profile_id');
+  final prefs = await SharedPreferences.getInstance();
+  final apotekProfileId = prefs.getString('apotek_profile_id');
 
-    if (apotekProfileId == null || apotekProfileId.isEmpty) {
-      debugPrint('❌ apotek_profile_id tidak ditemukan di SharedPreferences');
-      _showSnackbar('Gagal mengubah status: ID apotek tidak ditemukan');
-      return;
-    }
-
-    try {
-      final response = await http.post(
-        Uri.parse('http://mediquick.my.id/users/update_status.php'),
-        body: {'id': apotekProfileId, 'status': newStatus},
-      );
-
-      if (response.statusCode == 200) {
-        final result = jsonDecode(response.body);
-
-        if (result['success']) {
-          setState(() {
-            status = newStatus;
-          });
-          debugPrint('✅ Status berhasil diubah ke $newStatus');
-          _showSnackbar('Status berhasil diperbarui');
-        } else {
-          debugPrint('❌ Gagal update status: ${result['message']}');
-          _showSnackbar('Gagal update status: ${result['message']}');
-        }
-      } else {
-        debugPrint('❌ HTTP ${response.statusCode}');
-        _showSnackbar('Terjadi kesalahan server');
-      }
-    } catch (e) {
-      debugPrint('❌ Exception: $e');
-      _showSnackbar('Tidak dapat terhubung ke server');
-    }
+  if (apotekProfileId == null || apotekProfileId.isEmpty) {
+    debugPrint('❌ apotek_profile_id tidak ditemukan di SharedPreferences');
+    _showSnackbar('Gagal mengubah status: ID apotek tidak ditemukan');
+    return;
   }
+
+  try {
+    final response = await http.post(
+      Uri.parse('http://mediquick.my.id/users/update_status.php'),
+      body: {
+        'id': apotekProfileId,
+        'status': newStatus,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+
+      if (result['success']) {
+        setState(() {
+          status = newStatus;
+        });
+        debugPrint('✅ Status berhasil diubah ke $newStatus');
+        _showSnackbar('Status berhasil diperbarui');
+      } else {
+        debugPrint('❌ Gagal update status: ${result['message']}');
+        _showSnackbar('Gagal update status: ${result['message']}');
+      }
+    } else {
+      debugPrint('❌ HTTP ${response.statusCode}');
+      _showSnackbar('Terjadi kesalahan server');
+    }
+  } catch (e) {
+    debugPrint('❌ Exception: $e');
+    _showSnackbar('Tidak dapat terhubung ke server');
+  }
+}
+
 
   void _showSnackbar(String message) {
     if (!mounted) return;

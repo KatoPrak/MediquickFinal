@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString('userData', jsonEncode(userData));
       await prefs.setString('role', role);
       await prefs.setString('id', userData['id'].toString());
-      await prefs.setString('nama', userData['nama'].toString());
+      await prefs.setString('nama', userData['name'].toString());
       await prefs.setString('email', userData['email'].toString());
 
       if (role == 'apotek') {
