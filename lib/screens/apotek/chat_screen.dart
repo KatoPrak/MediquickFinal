@@ -35,15 +35,16 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     chatId = widget.chatId;
-    if (chatId != 0) {
-      loadMessages();
-    } else {
+
+    if (chatId == 0) {
       initChat();
+    } else {
+      loadMessages();
     }
-    _refreshTimer = Timer.periodic(
-      const Duration(seconds: 3),
-      (_) => loadMessages(),
-    );
+
+    _refreshTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (chatId != 0) loadMessages();
+    });
   }
 
   Future<void> initChat() async {
@@ -59,17 +60,17 @@ class _ChatScreenState extends State<ChatScreen> {
         },
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success']) {
-          setState(() {
-            chatId = int.tryParse(data['chat_id'].toString()) ?? 0;
-          });
-          loadMessages();
-        }
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success']) {
+        setState(() {
+          chatId = int.tryParse(data['chat_id'].toString()) ?? 0;
+        });
+        if (chatId != 0) loadMessages();
+      } else {
+        debugPrint('❌ Gagal init chat: ${data['message']}');
       }
     } catch (e) {
-      debugPrint('Error init chat: $e');
+      debugPrint('❌ Exception initChat: $e');
     }
   }
 
@@ -86,20 +87,16 @@ class _ChatScreenState extends State<ChatScreen> {
           final newMessages = List<ChatMessage>.from(
             data['messages'].map((json) => ChatMessage.fromJson(json)),
           )..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
           setState(() {
             messages = newMessages;
           });
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (scrollController.hasClients) {
-              scrollController.jumpTo(
-                scrollController.position.maxScrollExtent,
-              );
-            }
-          });
+
+          scrollToBottom();
         }
       }
     } catch (e) {
-      debugPrint('Error load messages: $e');
+      debugPrint('❌ Error loadMessages: $e');
     }
   }
 
@@ -126,18 +123,34 @@ class _ChatScreenState extends State<ChatScreen> {
         },
       );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success']) {
-          messageController.clear();
-          await loadMessages();
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200 && data['success']) {
+        messageController.clear();
+        await loadMessages();
+        scrollToBottom();
+      } else {
+        print('❌ Gagal kirim pesan: ${data['message']}');
+        if (data['error'] != null) {
+          print('🧨 Error detail: ${data['error']}');
         }
       }
     } catch (e) {
-      debugPrint('Error send message: $e');
+      debugPrint('❌ Exception sendMessage: $e');
     }
 
     setState(() => isLoading = false);
+  }
+
+  void scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -165,12 +178,6 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (context, index) {
                 final message = messages[index];
 
-                debugPrint(
-                  "message.senderId: ${message.senderId}, "
-                  "senderRole: ${message.senderRole}, "
-                  "userId: ${widget.userId}, apotekId: ${widget.apotekId}",
-                );
-
                 final isSenderApotek =
                     message.senderRole == 'apotek' &&
                     message.senderId == widget.apotekId;
@@ -191,7 +198,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
-                          message.senderRole == 'apotek' ? 'Apotek' : 'User',
+                          message.senderName, // ✅ pakai nama asli dari backend
                           style: const TextStyle(
                             fontSize: 10,
                             color: Colors.grey,

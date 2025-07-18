@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mediquick/screens/login/login_screen.dart';
+import 'package:mediquick/widget/Kelola%20Akun/manage_account_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/services.dart';
 
 class User {
   final String name;
@@ -77,12 +77,66 @@ class _GreetingSectionState extends State<GreetingSection> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
 
-    // Navigasi ke halaman login dan hapus semua route sebelumnya
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => const LoginScreen(),
-      ), // ganti dengan file login kamu
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
       (route) => false,
+    );
+  }
+
+  void _showSettingsMenu() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("Kelola Akun"),
+              onTap: () {
+                Navigator.pop(context); // Tutup bottom sheet
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ManageAccountScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () async {
+                Navigator.pop(context); // Tutup bottom sheet
+                final confirm = await showDialog(
+                  context: context,
+                  builder:
+                      (_) => AlertDialog(
+                        title: const Text("Logout"),
+                        content: const Text("Apakah Anda yakin ingin keluar?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text("Batal"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text("Logout"),
+                          ),
+                        ],
+                      ),
+                );
+
+                if (confirm == true) {
+                  _logout();
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -122,32 +176,40 @@ class _GreetingSectionState extends State<GreetingSection> {
             ),
           ],
         ),
-        IconButton(
-          icon: const Icon(Icons.logout, color: Color(0xFF6482AD)),
-          onPressed: () async {
-            final confirm = await showDialog(
-              context: context,
-              builder:
-                  (_) => AlertDialog(
-                    title: const Text("Logout"),
-                    content: const Text("Apakah Anda yakin ingin keluar?"),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text("Batal"),
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.settings, color: Color(0xFF6482AD)),
+              onPressed: _showSettingsMenu,
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout, color: Color(0xFF6482AD)),
+              onPressed: () async {
+                final confirm = await showDialog(
+                  context: context,
+                  builder:
+                      (_) => AlertDialog(
+                        title: const Text("Logout"),
+                        content: const Text("Apakah Anda yakin ingin keluar?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, false),
+                            child: const Text("Batal"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text("Logout"),
+                          ),
+                        ],
                       ),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text("Logout"),
-                      ),
-                    ],
-                  ),
-            );
+                );
 
-            if (confirm == true) {
-              _logout();
-            }
-          },
+                if (confirm == true) {
+                  _logout();
+                }
+              },
+            ),
+          ],
         ),
       ],
     );

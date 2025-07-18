@@ -45,32 +45,46 @@ class ProductBottomBar extends StatelessWidget {
               final prefs = await SharedPreferences.getInstance();
               final userId = int.tryParse(prefs.getString('id') ?? '') ?? 0;
 
+              if (userId == 0 || apotekId == 0) {
+                debugPrint('❌ User ID atau Apotek ID tidak valid');
+                return;
+              }
+
               final url = Uri.parse(
                 'http://mediquick.my.id/chatbox/create_or_get_chat.php',
               );
-              final response = await http.post(
-                url,
-                body: {
-                  'user_id': userId.toString(),
-                  'apotek_profiles.id': apotekId.toString(),
-                },
-              );
-
-              final data = jsonDecode(response.body);
-              if (data['success']) {
-                final chatId = int.parse(data['chat_id'].toString());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (_) => ChatScreen(
-                          userId: userId,
-                          apotekId: apotekId,
-                          chatId: chatId,
-                          isApotek: false,
-                        ),
-                  ),
+              try {
+                final response = await http.post(
+                  url,
+                  body: {
+                    'user_id': userId.toString(),
+                    // ✅ Pastikan sesuai dengan nama kolom di database: apotek_profile_id
+                    'apotek_id': apotekId.toString(),
+                  },
                 );
+
+                final data = jsonDecode(response.body);
+                debugPrint('📥 Respon create chat: $data');
+
+                if (data['success']) {
+                  final chatId = int.parse(data['chat_id'].toString());
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => ChatScreen(
+                            userId: userId,
+                            apotekId: apotekId,
+                            chatId: chatId,
+                            isApotek: false,
+                          ),
+                    ),
+                  );
+                } else {
+                  debugPrint('❌ Gagal membuka chat: ${data['message']}');
+                }
+              } catch (e) {
+                debugPrint('❌ Exception buka chat: $e');
               }
             },
             child: Container(

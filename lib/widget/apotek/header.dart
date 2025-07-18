@@ -30,7 +30,7 @@ class _ApotekHeaderState extends State<ApotekHeader> {
     try {
       final response = await http.get(
         Uri.parse(
-          'http://mediquick.my.id/notifications/get_unread_count.php?user_id=$userId',
+          'http://mediquick.my.id/orders/get_unread_count.php?user_id=$userId',
         ),
       );
 
