@@ -25,17 +25,14 @@ class RegisterInputField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Label
-        
+
         // Input Field
         TextFormField(
           controller: controller,
           obscureText: isPassword,
           validator: validator,
           keyboardType: keyboardType,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 16, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.grey[600]),
             hintText: hint,
@@ -45,14 +42,12 @@ class RegisterInputField extends StatelessWidget {
               vertical: 16,
               horizontal: 20,
             ),
-            hintStyle: TextStyle(
-              color: Colors.grey[600],
-              fontSize: 15,
-            ),
+            hintStyle: TextStyle(color: Colors.grey[600], fontSize: 15),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
+              borderSide: BorderSide(color: Colors.grey.shade400, width: 1.2),
             ),
+
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: const BorderSide(
@@ -62,10 +57,7 @@ class RegisterInputField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(
-                color: Colors.red,
-                width: 1.5,
-              ),
+              borderSide: const BorderSide(color: Colors.red, width: 1.5),
             ),
           ),
         ),

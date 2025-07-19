@@ -372,11 +372,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildSocialLoginButtons() {
     return Column(
       children: [
-        SocialLoginButton(
-          text: "Masuk dengan Facebook",
-          iconPath: "assets/icons/facebook.png",
-          onPressed: () => _handleSocialLogin('facebook'),
-        ),
         const SizedBox(height: 16),
         SocialLoginButton(
           text: "Masuk dengan Google",

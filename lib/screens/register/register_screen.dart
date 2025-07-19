@@ -207,14 +207,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 20),
                   RegisterSocialButton(
-                    text: "Masuk dengan Facebook",
-                    iconPath: "assets/icons/facebook.png",
-                    onPressed: () {
-                      print("Login dengan Facebook");
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  RegisterSocialButton(
                     text: "Masuk dengan Google",
                     iconPath: "assets/icons/google.png",
                     onPressed: () {

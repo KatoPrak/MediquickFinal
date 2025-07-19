@@ -51,6 +51,7 @@ dependencies:
   youtube_player_iframe: ^5.2.1
   flutter_launcher_icons: ^0.14.4
   mixpanel_flutter: ^2.4.4
+  google_sign_in: ^7.1.1
 
 dev_dependencies:
   flutter_test:
