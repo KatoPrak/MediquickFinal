@@ -28,7 +28,7 @@ class SocialLoginButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(iconPath, height: 24), // Ganti ikon dengan aset
+            Image.asset(iconPath, height: 24),
             const SizedBox(width: 8),
             Text(
               text,

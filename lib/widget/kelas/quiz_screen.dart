@@ -83,14 +83,20 @@ class _QuizScreenState extends State<QuizScreen> {
       builder:
           (_) => AlertDialog(
             title: const Text("🎉 Kuis Selesai"),
-            content: Text("Skor kamu: $score dari ${quizzes.length}"),
+            content: Text(
+              "Skor kamu: $score dari ${quizzes.length}",
+              style: const TextStyle(fontSize: 16),
+            ),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                   Navigator.pop(context);
                 },
-                child: const Text("Tutup"),
+                child: const Text(
+                  "Tutup",
+                  style: TextStyle(fontSize: 16, color: Color(0xFF7FA1C3)),
+                ),
               ),
             ],
           ),
@@ -117,7 +123,7 @@ class _QuizScreenState extends State<QuizScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Soal ${currentIndex + 1} / ${quizzes.length}"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Color(0xFF7FA1C3),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -154,7 +160,7 @@ class _QuizScreenState extends State<QuizScreen> {
                         border: Border.all(
                           color:
                               selectedOption == option
-                                  ? Colors.blueAccent
+                                  ? Color(0xFF7FA1C3)
                                   : Colors.grey.shade300,
                         ),
                         color:
@@ -199,7 +205,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 style: const TextStyle(fontSize: 16),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
+                backgroundColor: Color(0xFF7FA1C3),
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(

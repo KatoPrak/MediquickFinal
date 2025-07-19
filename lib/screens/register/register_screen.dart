@@ -87,9 +87,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(top: 40, left: 20, right: 20),
           child: SingleChildScrollView(
             child: Form(
               key: _formKey,
@@ -188,30 +188,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: Divider(thickness: 2, color: Colors.black),
+                        child: Divider(thickness: 2, color: Colors.grey[600]),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
                           "Atau dengan",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: Colors.grey[600],
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                       Expanded(
-                        child: Divider(thickness: 2, color: Colors.black),
+                        child: Divider(thickness: 2, color: Colors.grey[600]),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 20),
-                  RegisterSocialButton(
-                    text: "Masuk dengan Facebook",
-                    iconPath: "assets/icons/facebook.png",
-                    onPressed: () {
-                      print("Login dengan Facebook");
-                    },
                   ),
                   const SizedBox(height: 12),
                   RegisterSocialButton(
@@ -244,7 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           },
                           child: Text(
                             "Masuk",
-                            style: TextStyle(color: Color(0xFF3311F5)),
+                            style: TextStyle(color: Color(0xff6482AD)),
                           ),
                         ),
                       ],

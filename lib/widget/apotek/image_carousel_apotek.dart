@@ -11,11 +11,11 @@ class _ImageCarouselApotekState extends State<ImageCarouselApotek> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  final List<String> captions = [
-    "Lebih dari Sekadar Apotek, Kami Peduli dengan Kesehatan Anda",
-    "Solusi Tepat Pertolongan Pertama",
-    "Konsultasi Kesehatan Kapan Saja dan Di Mana Saja",
-    "Layanan Pengiriman Obat Cepat & Aman",
+  // Ganti path gambar sesuai kebutuhan
+  final List<String> imagePaths = [
+    "assets/images/iklan.jpg",
+    "assets/images/iklan.jpg",
+    "assets/images/iklan.jpg",
   ];
 
   @override
@@ -24,24 +24,20 @@ class _ImageCarouselApotekState extends State<ImageCarouselApotek> {
       height: 180,
       child: PageView.builder(
         controller: _controller,
-        itemCount: captions.length,
+        itemCount: imagePaths.length,
         onPageChanged: (index) {
           setState(() {
             _currentPage = index;
           });
         },
         itemBuilder: (context, index) {
-          return carouselItem(
-            "assets/images/banner1.jpg",
-            captions[index],
-            index,
-          );
+          return carouselItem(imagePaths[index], index);
         },
       ),
     );
   }
 
-  Widget carouselItem(String imagePath, String caption, int index) {
+  Widget carouselItem(String imagePath, int index) {
     return Stack(
       children: [
         ClipRRect(
@@ -53,28 +49,7 @@ class _ImageCarouselApotekState extends State<ImageCarouselApotek> {
             height: double.infinity,
           ),
         ),
-        // Teks
-        Positioned(
-          bottom: 22,
-          left: 16,
-          right: 16,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              caption,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ),
+
         // Indikator halaman
         Positioned(
           bottom: 12,
@@ -82,7 +57,7 @@ class _ImageCarouselApotekState extends State<ImageCarouselApotek> {
           right: 0,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(captions.length, (i) {
+            children: List.generate(imagePaths.length, (i) {
               return Container(
                 width: 8,
                 height: 8,

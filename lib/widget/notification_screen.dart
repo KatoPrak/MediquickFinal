@@ -18,8 +18,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    markNotificationsAsRead(); // ini sudah benar ✅
-    fetchNotifications(); // panggil fetch setelah mark read
+    markNotificationsAsRead();
+    fetchNotifications();
   }
 
   Future<void> markNotificationsAsRead() async {
@@ -81,7 +81,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Notifikasi")),
+      appBar: AppBar(
+        title: const Text("Notifikasi"),
+        backgroundColor: Color(0xFF6482AD),
+      ),
       body:
           isLoading
               ? const Center(child: CircularProgressIndicator())

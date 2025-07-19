@@ -17,15 +17,19 @@ class _PaymentWebViewState extends State<PaymentWebView> {
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse(widget.snapUrl));
+    _controller =
+        WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..loadRequest(Uri.parse(widget.snapUrl));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Pembayaran")),
+      appBar: AppBar(
+        title: const Text("Pembayaran"),
+        backgroundColor: Color(0xFF6482AD),
+      ),
       body: WebViewWidget(controller: _controller),
     );
   }

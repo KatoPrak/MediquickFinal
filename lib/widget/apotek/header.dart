@@ -39,8 +39,7 @@ class _ApotekHeaderState extends State<ApotekHeader> {
         if (data['success']) {
           if (mounted) {
             setState(() {
-              unreadCount =
-                  data['unread_count']; // <-- cocokkan dengan key dari JSON
+              unreadCount = data['unread_count'];
             });
           }
         }
@@ -60,7 +59,7 @@ class _ApotekHeaderState extends State<ApotekHeader> {
           const Text(
             'Apotek',
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Color(0xFF6482AD),
             ),

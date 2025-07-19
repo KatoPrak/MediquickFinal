@@ -84,15 +84,17 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
                     ),
                   ).then((_) => _loadUserData());
                 },
-                icon: const Icon(Icons.edit),
-                label: const Text("Ubah Data Akun"),
+                icon: const Icon(Icons.edit, color: Colors.white),
+                label: const Text(
+                  "Ubah Data Akun",
+                  style: TextStyle(color: Colors.white),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF6482AD),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  textStyle: const TextStyle(fontSize: 16),
                 ),
               ),
             ),

@@ -121,12 +121,12 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           _handleErrorResponse(data);
         }
-      } on SocketException catch (e) {
+      } on SocketException {
         _showErrorSnackbar(
           "Tidak dapat terhubung ke server. Periksa jaringan.",
         );
         debugPrint("SocketException: \$e");
-      } on FormatException catch (e) {
+      } on FormatException {
         _showErrorSnackbar("Format data tidak valid: \${e.message}");
       } on http.ClientException {
         _showErrorSnackbar("Gagal terhubung ke server");
@@ -373,12 +373,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Column(
       children: [
         SocialLoginButton(
-          text: "Masuk dengan Facebook",
-          iconPath: "assets/icons/facebook.png",
-          onPressed: () => _handleSocialLogin('facebook'),
-        ),
-        const SizedBox(height: 16),
-        SocialLoginButton(
           text: "Masuk dengan Google",
           iconPath: "assets/icons/google.png",
           onPressed: () => _handleSocialLogin('google'),
@@ -426,12 +420,12 @@ class _OrDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(child: Divider(thickness: 2)),
+        Expanded(child: Divider(thickness: 2, color: Colors.grey[600])),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text("Atau dengan", style: TextStyle(color: Colors.grey[600])),
         ),
-        const Expanded(child: Divider(thickness: 2)),
+        Expanded(child: Divider(thickness: 2, color: Colors.grey[600])),
       ],
     );
   }
@@ -453,7 +447,10 @@ class _RegisterPrompt extends StatelessWidget {
                   context,
                   MaterialPageRoute(builder: (_) => const RegisterScreen()),
                 ),
-            child: const Text("Daftar", style: TextStyle(color: Colors.blue)),
+            child: const Text(
+              "Daftar",
+              style: TextStyle(color: Color(0xFF6482AD)),
+            ),
           ),
         ],
       ),

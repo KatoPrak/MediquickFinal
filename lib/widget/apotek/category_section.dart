@@ -10,10 +10,9 @@ class CategoryApotekSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categories = [
-      {'iconPath': 'assets/images/tablet.png', 'label': 'Tablet'},
-      {'iconPath': 'assets/images/kapsul.png', 'label': 'Kapsul'},
-      {'iconPath': 'assets/images/puyer.jpg', 'label': 'Puyer'},
-      {'iconPath': 'assets/images/sirup.png', 'label': 'Sirup'},
+      {'iconPath': 'assets/images/tablet.jpg', 'label': 'Tablet'},
+      {'iconPath': 'assets/images/kapsul.jpg', 'label': 'Kapsul'},
+      {'iconPath': 'assets/images/sirup.jpg', 'label': 'Sirup'},
     ];
 
     return Padding(
@@ -24,7 +23,7 @@ class CategoryApotekSection extends StatelessWidget {
           const Text('Jenis Obat', style: TextStyle(fontSize: 18)),
           const SizedBox(height: 20),
           GridView.count(
-            crossAxisCount: 4,
+            crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children:
@@ -42,14 +41,17 @@ class CategoryApotekSection extends StatelessWidget {
                     child: Column(
                       children: [
                         CircleAvatar(
-                          radius: 30,
+                          radius: 35,
                           backgroundImage: AssetImage(item['iconPath']!),
                           backgroundColor: Colors.grey[200],
                         ),
                         const SizedBox(height: 6),
                         Text(
                           item['label']!,
-                          style: const TextStyle(fontSize: 12),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -115,7 +117,7 @@ class _ProdukByJenisScreenState extends State<ProdukByJenisScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.jenis}'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Color(0xFF6482AD),
       ),
       body:
           _loading
@@ -133,9 +135,7 @@ class _ProdukByJenisScreenState extends State<ProdukByJenisScreen> {
                         MaterialPageRoute(
                           builder:
                               (_) => ProductDetailScreen(
-                                productId: int.parse(
-                                  p['id'].toString(),
-                                ), // pastikan id dalam int
+                                productId: int.parse(p['id'].toString()),
                               ),
                         ),
                       );

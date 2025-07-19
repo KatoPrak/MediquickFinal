@@ -66,9 +66,9 @@ class _PopularProductsState extends State<PopularProducts> {
               ? const Center(child: Text('Tidak ada produk tersedia'))
               : GridView.count(
                 crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.7,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.68,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 children:
@@ -108,7 +108,6 @@ class PharmacyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigasi ke halaman detail produk dengan productId
         Navigator.push(
           context,
           MaterialPageRoute(

@@ -24,7 +24,7 @@ class CartScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFF5EDED),
       appBar: AppBar(
         leading: const BackButton(color: Colors.black),
-        backgroundColor: Colors.transparent,
+        backgroundColor: Color(0xFF6482AD),
         elevation: 0,
         centerTitle: true,
         title: const Text('Keranjang', style: TextStyle(color: Colors.black)),
@@ -77,7 +77,10 @@ class CartScreen extends StatelessWidget {
                           children: [
                             Text(
                               item.pharmacyName,
-                              style: const TextStyle(color: Colors.grey),
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -220,12 +223,8 @@ class CartScreen extends StatelessWidget {
                                       productImage: selectedItem.imageUrl,
                                       quantity: selectedItem.quantity,
                                       productPrice: selectedItem.price,
-                                      productId:
-                                          selectedItem
-                                              .productId, // ✅ Tidak error lagi
-                                      apotekId:
-                                          selectedItem
-                                              .apotekId, // ✅ Tidak error lagi
+                                      productId: selectedItem.productId,
+                                      apotekId: selectedItem.apotekId,
                                     ),
                               ),
                             );
