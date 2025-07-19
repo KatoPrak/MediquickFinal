@@ -75,7 +75,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   _buildDashboardCard(
                     icon: Icons.people,
-                    title: "Manajemen User",
+                    title: "Manajemen Apotek",
                     color: Colors.blue,
                     onTap: () {
                       Navigator.push(

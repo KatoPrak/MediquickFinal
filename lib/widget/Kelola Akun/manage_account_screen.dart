@@ -13,14 +13,12 @@ class ManageAccountScreen extends StatefulWidget {
 class _ManageAccountScreenState extends State<ManageAccountScreen> {
   String nama = '';
   String email = '';
-  String role = '';
 
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       nama = prefs.getString('nama') ?? 'Tidak diketahui';
       email = prefs.getString('email') ?? 'Tidak diketahui';
-      role = prefs.getString('role') ?? '-';
     });
   }
 
@@ -67,7 +65,6 @@ class _ManageAccountScreenState extends State<ManageAccountScreen> {
                     const SizedBox(height: 20),
                     _infoTile(Icons.person, "Nama", nama),
                     _infoTile(Icons.email, "Email", email),
-                    _infoTile(Icons.verified_user, "Role", role),
                   ],
                 ),
               ),

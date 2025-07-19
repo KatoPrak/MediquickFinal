@@ -21,7 +21,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  bool _agreeToTerms = false; // 👉 status checkbox
+
   Future<void> _validateAndRegister() async {
+    if (!_agreeToTerms) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('❌ Anda harus menyetujui Syarat dan Ketentuan'),
+        ),
+      );
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
       final url = Uri.parse("https://mediquick.my.id/add_users.php");
 
@@ -41,19 +52,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
 
         final data = jsonDecode(response.body);
-        print("Status: ${response.statusCode}");
-        print("Response: $data");
-
         if (data['status'] == "success") {
-          _showSuccessDialog(); // tampilkan dialog sukses
+          _showSuccessDialog();
         } else {
-          // tampilkan error sebenarnya
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('❌ ${data['message']}')));
         }
       } catch (e) {
-        // kesalahan di sisi Flutter
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('❌ Terjadi kesalahan: $e')));
@@ -114,24 +120,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     controller: _nameController,
                     icon: Icons.person,
                     hint: "Username",
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Username harus diisi";
-                      }
-                      return null;
-                    },
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? "Username harus diisi"
+                                : null,
                   ),
                   const SizedBox(height: 12),
                   RegisterInputField(
                     controller: _emailController,
                     icon: Icons.email,
                     hint: "Email",
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Email harus diisi";
-                      }
-                      return null;
-                    },
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? "Email harus diisi"
+                                : null,
                   ),
                   const SizedBox(height: 12),
                   RegisterInputField(
@@ -139,12 +143,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.lock,
                     hint: "Kata Sandi",
                     isPassword: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Kata sandi harus diisi";
-                      }
-                      return null;
-                    },
+                    validator:
+                        (value) =>
+                            value == null || value.isEmpty
+                                ? "Kata sandi harus diisi"
+                                : null,
                   ),
                   const SizedBox(height: 12),
                   RegisterInputField(
@@ -153,21 +156,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: "Konfirmasi Kata Sandi",
                     isPassword: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null || value.isEmpty)
                         return "Konfirmasi kata sandi harus diisi";
-                      }
-                      if (value != _passwordController.text) {
-                        return "Kata sandi dan konfirmasi kata sandi tidak sama";
-                      }
+                      if (value != _passwordController.text)
+                        return "Kata sandi dan konfirmasi tidak sama";
                       return null;
                     },
                   ),
                   const SizedBox(height: 20),
+
+                  // ✅ Checkbox Syarat & Ketentuan
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _agreeToTerms,
+                        onChanged: (value) {
+                          setState(() {
+                            _agreeToTerms = value ?? false;
+                          });
+                        },
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() => _agreeToTerms = !_agreeToTerms);
+                          },
+                          child: Text(
+                            "Saya menyetujui Syarat dan Ketentuan yang berlaku.",
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xff6482AD),
+                        backgroundColor: const Color(0xff6482AD),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -187,11 +218,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      Expanded(
+                      const Expanded(
                         child: Divider(thickness: 2, color: Colors.black),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
                         child: Text(
                           "Atau dengan",
                           style: TextStyle(
@@ -200,7 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ),
-                      Expanded(
+                      const Expanded(
                         child: Divider(thickness: 2, color: Colors.black),
                       ),
                     ],
@@ -218,7 +249,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Sudah Punya Akun?",
                           style: TextStyle(
                             color: Colors.black,
@@ -230,11 +261,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LoginScreen(),
+                                builder: (context) => const LoginScreen(),
                               ),
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             "Masuk",
                             style: TextStyle(color: Color(0xFF3311F5)),
                           ),

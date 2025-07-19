@@ -1,3 +1,5 @@
+// widget/apotek/image_carousel_apotek.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class ImageCarouselApotek extends StatefulWidget {
@@ -10,93 +12,90 @@ class ImageCarouselApotek extends StatefulWidget {
 class _ImageCarouselApotekState extends State<ImageCarouselApotek> {
   final PageController _controller = PageController();
   int _currentPage = 0;
+  Timer? _timer;
 
-  final List<String> captions = [
-    "Lebih dari Sekadar Apotek, Kami Peduli dengan Kesehatan Anda",
-    "Solusi Tepat Pertolongan Pertama",
-    "Konsultasi Kesehatan Kapan Saja dan Di Mana Saja",
-    "Layanan Pengiriman Obat Cepat & Aman",
+  final List<String> imagePaths = [
+    "assets/images/caraousel1.png",
+    "assets/images/caraousel2.png",
+    "assets/images/caraousel3.png",
   ];
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 180,
-      child: PageView.builder(
-        controller: _controller,
-        itemCount: captions.length,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
-        },
-        itemBuilder: (context, index) {
-          return carouselItem(
-            "assets/images/banner1.jpg",
-            captions[index],
-            index,
-          );
-        },
-      ),
-    );
+  void initState() {
+    super.initState();
+    _startAutoSlide();
   }
 
-  Widget carouselItem(String imagePath, String caption, int index) {
-    return Stack(
+  void _startAutoSlide() {
+    _timer = Timer.periodic(const Duration(seconds: 4), (Timer timer) {
+      if (_currentPage < imagePaths.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+
+      _controller.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-        ),
-        // Teks
-        Positioned(
-          bottom: 22,
-          left: 16,
-          right: 16,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              caption,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ),
-        // Indikator halaman
-        Positioned(
-          bottom: 12,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(captions.length, (i) {
-              return Container(
-                width: 8,
-                height: 8,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      _currentPage == i
-                          ? const Color(0xFF6482AD)
-                          : Colors.white,
+        SizedBox(
+          height: 180,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: imagePaths.length,
+            onPageChanged: (index) {
+              setState(() {
+                _currentPage = index;
+              });
+            },
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    imagePaths[index],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
                 ),
               );
-            }),
+            },
           ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(imagePaths.length, (index) {
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: _currentPage == index ? 10 : 8,
+              height: _currentPage == index ? 10 : 8,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    _currentPage == index
+                        ? const Color(0xFF6482AD)
+                        : Colors.grey[300],
+              ),
+            );
+          }),
         ),
       ],
     );

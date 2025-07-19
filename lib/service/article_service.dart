@@ -12,8 +12,9 @@ class ArticleService {
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
-
-      if (body is Map<String, dynamic> && body['status'] == true && body.containsKey('data')) {
+      if (body is Map<String, dynamic> &&
+          body['status'] == true &&
+          body.containsKey('data')) {
         return (body['data'] as List)
             .map((json) => Article.fromJson(Map<String, dynamic>.from(json)))
             .toList();
@@ -30,7 +31,7 @@ class ArticleService {
       final response = await http.post(
         Uri.parse(_baseUrl),
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(article.toJson()),
+        body: json.encode({'action': 'create', ...article.toJson()}),
       );
 
       debugPrint('POST status: ${response.statusCode}');
@@ -52,40 +53,50 @@ class ArticleService {
   }
 
   Future<void> updateArticle(Article article) async {
-    final url = Uri.parse('$_baseUrl/${article.id}');
-    final response = await http.put(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(article.toJson()),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'action': 'update', ...article.toJson()}),
+      );
 
-    debugPrint('PUT status: ${response.statusCode}');
-    debugPrint('PUT body: ${response.body}');
+      debugPrint('UPDATE status: ${response.statusCode}');
+      debugPrint('UPDATE body: ${response.body}');
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['status'] != true) {
-        throw Exception(data['error'] ?? 'Gagal update artikel');
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] != true) {
+          throw Exception(data['error'] ?? 'Gagal update artikel');
+        }
+      } else {
+        throw Exception(_parseErrorMessage(response));
       }
-    } else {
-      throw Exception(_parseErrorMessage(response));
+    } catch (e) {
+      throw Exception('Gagal update artikel: ${e.toString()}');
     }
   }
 
   Future<void> deleteArticle(int id) async {
-    final url = Uri.parse('$_baseUrl/$id');
-    final response = await http.delete(url);
+    try {
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'action': 'delete', 'id': id}),
+      );
 
-    debugPrint('DELETE status: ${response.statusCode}');
-    debugPrint('DELETE body: ${response.body}');
+      debugPrint('DELETE status: ${response.statusCode}');
+      debugPrint('DELETE body: ${response.body}');
 
-    if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-      if (body['status'] != true) {
-        throw Exception(body['error'] ?? 'Gagal menghapus artikel');
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] != true) {
+          throw Exception(data['error'] ?? 'Gagal menghapus artikel');
+        }
+      } else {
+        throw Exception(_parseErrorMessage(response));
       }
-    } else {
-      throw Exception(_parseErrorMessage(response));
+    } catch (e) {
+      throw Exception('Gagal menghapus artikel: ${e.toString()}');
     }
   }
 }

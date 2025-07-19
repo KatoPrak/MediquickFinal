@@ -87,55 +87,85 @@ class _GreetingSectionState extends State<GreetingSection> {
   void _showSettingsMenu() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true, // agar bisa lebih tinggi
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) {
-        return Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text("Kelola Akun"),
-              onTap: () {
-                Navigator.pop(context); // Tutup bottom sheet
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ManageAccountScreen(),
-                  ),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text("Logout"),
-              onTap: () async {
-                Navigator.pop(context); // Tutup bottom sheet
-                final confirm = await showDialog(
-                  context: context,
-                  builder:
-                      (_) => AlertDialog(
-                        title: const Text("Logout"),
-                        content: const Text("Apakah Anda yakin ingin keluar?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context, false),
-                            child: const Text("Batal"),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => Navigator.pop(context, true),
-                            child: const Text("Logout"),
-                          ),
-                        ],
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.4, // 40% tinggi layar
+          minChildSize: 0.25,
+          maxChildSize: 0.6,
+          builder: (context, scrollController) {
+            return SingleChildScrollView(
+              controller: scrollController,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text(
+                      'Pengaturan Akun',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                );
+                    ),
+                  ),
+                  const Divider(),
 
-                if (confirm == true) {
-                  _logout();
-                }
-              },
-            ),
-          ],
+                  ListTile(
+                    leading: const Icon(Icons.person),
+                    title: const Text("Kelola Akun"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ManageAccountScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.logout),
+                    title: const Text("Logout"),
+                    onTap: () async {
+                      Navigator.pop(context); // Tutup bottom sheet
+                      final confirm = await showDialog(
+                        context: context,
+                        builder: (BuildContext dialogContext) {
+                          return AlertDialog(
+                            title: const Text("Logout"),
+                            content: const Text(
+                              "Apakah Anda yakin ingin keluar?",
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed:
+                                    () => Navigator.pop(dialogContext, false),
+                                child: const Text("Batal"),
+                              ),
+                              ElevatedButton(
+                                onPressed:
+                                    () => Navigator.pop(dialogContext, true),
+                                child: const Text("Logout"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      if (confirm == true) {
+                        _logout();
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 24), // 👉 Jarak ekstra bawah
+                ],
+              ),
+            );
+          },
         );
       },
     );

@@ -25,10 +25,10 @@ class _PopularProductsState extends State<PopularProducts> {
     final url = Uri.parse('http://mediquick.my.id/products/read_all.php');
     try {
       final response = await http.get(url);
-      print('RESPONSE: ${response.body}');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data['success']) {
+          if (!mounted) return;
           setState(() {
             _products = data['data'];
             _loading = false;
@@ -45,6 +45,7 @@ class _PopularProductsState extends State<PopularProducts> {
   }
 
   void showError(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
@@ -64,15 +65,27 @@ class _PopularProductsState extends State<PopularProducts> {
               ? const Center(child: CircularProgressIndicator())
               : _products.isEmpty
               ? const Center(child: Text('Tidak ada produk tersedia'))
-              : GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 0.7,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children:
-                    _products.map((product) {
+              : LayoutBuilder(
+                builder: (context, constraints) {
+                  double maxWidth = constraints.maxWidth;
+                  double itemWidth = 130; // min lebar item
+                  int crossAxisCount = (maxWidth / itemWidth).floor().clamp(
+                    1,
+                    6,
+                  );
+
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _products.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 0.7,
+                    ),
+                    itemBuilder: (context, index) {
+                      final product = _products[index];
                       return PharmacyCard(
                         productId: product['id'],
                         imagePath: product['gambar_url'] ?? '',
@@ -80,7 +93,9 @@ class _PopularProductsState extends State<PopularProducts> {
                         price: 'Rp ${product['harga'] ?? '0'}',
                         pharmacyName: product['nama_apotek'] ?? 'Apotek',
                       );
-                    }).toList(),
+                    },
+                  );
+                },
               ),
         ],
       ),
@@ -108,7 +123,6 @@ class PharmacyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigasi ke halaman detail produk dengan productId
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -155,7 +169,7 @@ class PharmacyCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(price, style: const TextStyle(color: Colors.teal)),
-            const SizedBox(height: 35),
+            const Spacer(),
             Text(
               pharmacyName.isNotEmpty ? pharmacyName : 'Apotek',
               style: const TextStyle(fontSize: 12, color: Colors.grey),

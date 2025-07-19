@@ -1,3 +1,5 @@
+// widget/dashboard/image_carousel.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class ImageCarousel extends StatefulWidget {
@@ -10,13 +12,39 @@ class ImageCarousel extends StatefulWidget {
 class _ImageCarouselState extends State<ImageCarousel> {
   final PageController _controller = PageController();
   int _currentPage = 0;
+  Timer? _timer;
 
-  final List<String> captions = [
-    "Lebih dari Sekadar Apotek, Kami Peduli dengan Kesehatan Anda",
-    "Solusi Tepat Pertolongan Pertama",
-    "Konsultasi Kesehatan Kapan Saja dan Di Mana Saja",
-    "Layanan Pengiriman Obat Cepat & Aman",
+  final List<String> carouselImages = [
+    "assets/images/caraousel1.png",
+    "assets/images/caraousel2.png",
+    "assets/images/caraousel3.png",
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (_controller.hasClients) {
+        int nextPage = (_currentPage + 1) % carouselImages.length;
+        _controller.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,24 +52,20 @@ class _ImageCarouselState extends State<ImageCarousel> {
       height: 180,
       child: PageView.builder(
         controller: _controller,
-        itemCount: captions.length,
+        itemCount: carouselImages.length,
         onPageChanged: (index) {
           setState(() {
             _currentPage = index;
           });
         },
         itemBuilder: (context, index) {
-          return carouselItem(
-            "assets/images/banner1.jpg",
-            captions[index],
-            index,
-          );
+          return carouselItem(carouselImages[index]);
         },
       ),
     );
   }
 
-  Widget carouselItem(String imagePath, String caption, int index) {
+  Widget carouselItem(String imagePath) {
     return Stack(
       children: [
         ClipRRect(
@@ -53,36 +77,13 @@ class _ImageCarouselState extends State<ImageCarousel> {
             height: double.infinity,
           ),
         ),
-        // Teks
-        Positioned(
-          bottom: 22,
-          left: 16,
-          right: 16,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white70,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              caption,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ),
-        // Indikator halaman
         Positioned(
           bottom: 12,
           left: 0,
           right: 0,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(captions.length, (i) {
+            children: List.generate(carouselImages.length, (i) {
               return Container(
                 width: 8,
                 height: 8,
@@ -90,9 +91,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color:
-                      _currentPage == i
-                          ? const Color(0xFF6482AD)
-                          : Colors.white,
+                      _currentPage == i ? const Color(0xFF6482AD) : Colors.white,
                 ),
               );
             }),

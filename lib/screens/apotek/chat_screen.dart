@@ -35,7 +35,6 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     chatId = widget.chatId;
-
     if (chatId == 0) {
       initChat();
     } else {
@@ -129,9 +128,9 @@ class _ChatScreenState extends State<ChatScreen> {
         await loadMessages();
         scrollToBottom();
       } else {
-        print('❌ Gagal kirim pesan: ${data['message']}');
+        debugPrint('❌ Gagal kirim pesan: ${data['message']}');
         if (data['error'] != null) {
-          print('🧨 Error detail: ${data['error']}');
+          debugPrint('🧨 Error detail: ${data['error']}');
         }
       }
     } catch (e) {
@@ -163,10 +162,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = const Color(0xFFF6F8FA);
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
+        elevation: 1,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
         title: Text(
           widget.isApotek ? 'Chat dengan Pengguna' : 'Chat dengan Apotek',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -174,6 +180,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: ListView.builder(
               controller: scrollController,
+              padding: const EdgeInsets.all(12),
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final message = messages[index];
@@ -189,54 +196,54 @@ class _ChatScreenState extends State<ChatScreen> {
                 return Align(
                   alignment:
                       isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Column(
-                    crossAxisAlignment:
-                        isMe
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          message.senderName, // ✅ pakai nama asli dari backend
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: Colors.grey,
-                          ),
-                        ),
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.75,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isMe ? const Color(0xFF7FA1C3) : Colors.white,
+                      gradient:
+                          isMe
+                              ? const LinearGradient(
+                                colors: [Color(0xFF7FA1C3), Color(0xFF4B6D92)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              )
+                              : null,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(16),
+                        topRight: const Radius.circular(16),
+                        bottomLeft: Radius.circular(isMe ? 16 : 0),
+                        bottomRight: Radius.circular(isMe ? 0 : 16),
                       ),
-                      Container(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.7,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 12,
-                        ),
-                        margin: const EdgeInsets.symmetric(
-                          vertical: 4,
-                          horizontal: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isMe ? Colors.blue : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          message.message,
-                          style: TextStyle(
-                            color: isMe ? Colors.white : Colors.black,
-                          ),
-                        ),
+                      ],
+                    ),
+                    child: Text(
+                      message.message,
+                      style: TextStyle(
+                        color: isMe ? Colors.white : Colors.black,
+                        fontSize: 14,
                       ),
-                    ],
+                    ),
                   ),
                 );
               },
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            color: Colors.grey[100],
+            color: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Row(
               children: [
                 Expanded(
@@ -245,31 +252,46 @@ class _ChatScreenState extends State<ChatScreen> {
                     onChanged: (_) => setState(() {}),
                     onSubmitted: (_) => sendMessage(),
                     textInputAction: TextInputAction.send,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Tulis pesan...',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                      filled: true,
+                      fillColor: const Color(0xFFF0F2F5),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24),
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed:
-                      isLoading || messageController.text.trim().isEmpty
-                          ? null
-                          : sendMessage,
-                  child:
-                      isLoading
-                          ? const SizedBox(
-                            height: 16,
-                            width: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                          : const Icon(Icons.send),
+                ClipOval(
+                  child: Material(
+                    color: const Color(0xFF7FA1C3),
+                    child: InkWell(
+                      onTap:
+                          isLoading || messageController.text.trim().isEmpty
+                              ? null
+                              : sendMessage,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child:
+                            isLoading
+                                ? const SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                                : const Icon(Icons.send, color: Colors.white),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
