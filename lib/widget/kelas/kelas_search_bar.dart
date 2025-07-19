@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mediquick/main.dart' as MixpanelManager;
 
 class ClassSearchBar extends StatelessWidget {
   final ValueChanged<String> onChanged;
@@ -20,7 +21,19 @@ class ClassSearchBar extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: TextField(
-                onChanged: onChanged,
+                onChanged: (value) {
+                  // 🔹 Kirim event ke Mixpanel
+                  MixpanelManager.mixpanel.track(
+                    "Class Search",
+                    properties: {
+                      'search_keyword': value,
+                      'timestamp': DateTime.now().toIso8601String(),
+                    },
+                  );
+
+                  // Callback ke parent widget
+                  onChanged(value);
+                },
                 decoration: const InputDecoration(
                   hintText: "Cari Kelas",
                   hintStyle: TextStyle(

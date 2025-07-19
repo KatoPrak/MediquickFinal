@@ -74,8 +74,14 @@ class _AddressScreenState extends State<AddressScreen> {
         padding: const EdgeInsets.all(16),
         child: ElevatedButton.icon(
           onPressed: _navigateToAddAddress,
-          icon: const Icon(Icons.add_location_alt_outlined),
-          label: const Text('Tambahkan Alamat'),
+          icon: const Icon(
+            Icons.add_location_alt_outlined,
+            color: Colors.white,
+          ),
+          label: const Text(
+            'Tambahkan Alamat',
+            style: TextStyle(color: Colors.white),
+          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF8FAAC7),
             minimumSize: const Size.fromHeight(50),

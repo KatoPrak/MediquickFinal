@@ -1,6 +1,7 @@
 // screens/edukasi/edukasi_screen.dart
 import 'package:flutter/material.dart';
 import 'package:mediquick/admin/model/article_model.dart';
+import 'package:mediquick/main.dart';
 import 'package:mediquick/service/article_service.dart';
 import 'package:mediquick/widget/edukasi/education_card.dart';
 import 'package:mediquick/widget/edukasi/education_filter_buttons.dart';
@@ -23,6 +24,13 @@ class _EducationScreenState extends State<EducationScreen> {
   void initState() {
     super.initState();
     _fetchArticles();
+    mixpanel.track(
+      "View Article List",
+      properties: {
+        'source': 'EducationScreen',
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
   }
 
   Future<void> _fetchArticles() async {
@@ -34,9 +42,9 @@ class _EducationScreenState extends State<EducationScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memuat artikel: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Gagal memuat artikel: $e')));
     }
   }
 
@@ -54,14 +62,25 @@ class _EducationScreenState extends State<EducationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _articles.where((article) {
-      final matchesFilter = _selectedFilter.isEmpty || article.type.toLowerCase() == _selectedFilter.toLowerCase();
-      final matchesSearch = article.title.toLowerCase().contains(_searchQuery);
-      return matchesFilter && matchesSearch;
-    }).toList();
+    final filtered =
+        _articles.where((article) {
+          final matchesFilter =
+              _selectedFilter.isEmpty ||
+              article.type.toLowerCase() == _selectedFilter.toLowerCase();
+          final matchesSearch = article.title.toLowerCase().contains(
+            _searchQuery,
+          );
+          return matchesFilter && matchesSearch;
+        }).toList();
 
-    final pertolongan = filtered.where((a) => a.type.toLowerCase() == 'pertolongan pertama').toList();
-    final artikel = filtered.where((a) => a.type.toLowerCase() == 'artikel kesehatan').toList();
+    final pertolongan =
+        filtered
+            .where((a) => a.type.toLowerCase() == 'pertolongan pertama')
+            .toList();
+    final artikel =
+        filtered
+            .where((a) => a.type.toLowerCase() == 'artikel kesehatan')
+            .toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5EDED),

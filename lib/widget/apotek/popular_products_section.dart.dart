@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediquick/main.dart' as MixpanelManager;
 import 'package:mediquick/screens/apotek/produk_detail_screen.dart';
 
 class PopularProducts extends StatefulWidget {
@@ -108,6 +109,16 @@ class PharmacyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
+        // Track event Mixpanel
+        MixpanelManager.mixpanel.track(
+          'View Product Detail',
+          properties: {
+            'product_id': productId,
+            'product_name': title,
+            'pharmacy_name': pharmacyName,
+            'price': price,
+          },
+        );
         Navigator.push(
           context,
           MaterialPageRoute(

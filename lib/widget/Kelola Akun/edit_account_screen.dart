@@ -173,7 +173,7 @@ class _EditAccountScreenState extends State<EditAccountScreen> {
                           ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
                             "Simpan Perubahan",
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: 16, color: Colors.white),
                           ),
                 ),
               ),

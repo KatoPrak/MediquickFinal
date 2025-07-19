@@ -1,5 +1,5 @@
-// widget/kelas/kelas_detail_screen.dart
 import 'package:flutter/material.dart';
+import 'package:mediquick/main.dart' as MixpanelManager;
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:mediquick/widget/kelas/quiz_screen.dart';
 
@@ -188,6 +188,16 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
                         Center(
                           child: ElevatedButton.icon(
                             onPressed: () {
+                              // Tracking Event Mixpanel
+                              MixpanelManager.mixpanel.track(
+                                'Mulai Kuis',
+                                properties: {
+                                  'kelas_id': widget.id,
+                                  'judul_kelas': widget.title,
+                                  'waktu_mulai':
+                                      DateTime.now().toIso8601String(),
+                                },
+                              );
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

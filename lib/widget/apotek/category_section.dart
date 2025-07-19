@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediquick/main.dart' as MixpanelManager;
 import 'package:mediquick/screens/apotek/produk_detail_screen.dart';
 
 class CategoryApotekSection extends StatelessWidget {
@@ -30,6 +31,12 @@ class CategoryApotekSection extends StatelessWidget {
                 categories.map((item) {
                   return GestureDetector(
                     onTap: () {
+                      // Track ke Mixpanel
+                      MixpanelManager.mixpanel.track(
+                        'Select Obat Jenis',
+                        properties: {'jenis': item['label']},
+                      );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

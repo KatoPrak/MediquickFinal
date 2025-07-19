@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediquick/main.dart' as MixpanelManager;
 import 'package:mediquick/screens/apotek/produk_detail_screen.dart';
 import 'search_results_page.dart';
 
@@ -22,6 +23,12 @@ class _SearchBarApotekState extends State<SearchBarApotek> {
       return;
     }
 
+    // ⬇ Track keyword yang diketik
+    MixpanelManager.mixpanel.track(
+      "Search Typed",
+      properties: {"keyword": keyword, "source": "Apotek SearchBar"},
+    );
+
     final url = Uri.parse(
       'http://mediquick.my.id/products/search.php?query=$keyword',
     );
@@ -37,6 +44,11 @@ class _SearchBarApotekState extends State<SearchBarApotek> {
   void _submitSearch() {
     final query = _controller.text.trim();
     if (query.isNotEmpty) {
+      // ⬇ Track submit pencarian
+      MixpanelManager.mixpanel.track(
+        "Search Submitted",
+        properties: {"keyword": query, "source": "Apotek SearchBar"},
+      );
       Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => SearchResultsPage(query: query)),

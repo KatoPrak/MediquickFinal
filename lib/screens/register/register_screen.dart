@@ -1,6 +1,7 @@
 // screens/register/register_screen.dart
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediquick/mixpanel_service.dart';
 import 'dart:convert';
 import 'package:mediquick/screens/login/login_screen.dart';
 import 'package:mediquick/widget/register/register_input_field.dart';
@@ -25,6 +26,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (_formKey.currentState!.validate()) {
       final url = Uri.parse("https://mediquick.my.id/add_users.php");
 
+      final name = _nameController.text.trim();
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
       try {
         final response = await http.post(
           url,
@@ -33,9 +38,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             "Accept": "application/json",
           },
           body: jsonEncode({
-            "name": _nameController.text.trim(),
-            "email": _emailController.text.trim(),
-            "password": _passwordController.text.trim(),
+            "name": name,
+            "email": email,
+            "password": password,
             "role": "user",
           }),
         );
@@ -45,15 +50,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
         print("Response: $data");
 
         if (data['status'] == "success") {
+          /// ✅ Log Mixpanel event
+          final mixpanel = MixpanelService.instance;
+
+          mixpanel.identify(email); // pakai email untuk identifikasi
+          mixpanel.getPeople().set('name', name);
+          mixpanel.getPeople().set('email', email);
+          mixpanel.getPeople().set('role', 'user');
+          mixpanel.getPeople().set(
+            'registered_at',
+            DateTime.now().toIso8601String(),
+          );
+
+          mixpanel.track(
+            'User Registered',
+            properties: {
+              'email': email,
+              'name': name,
+              'role': 'user',
+              'registered_at': DateTime.now().toIso8601String(),
+            },
+          );
+
           _showSuccessDialog(); // tampilkan dialog sukses
         } else {
-          // tampilkan error sebenarnya
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('❌ ${data['message']}')));
         }
       } catch (e) {
-        // kesalahan di sisi Flutter
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('❌ Terjadi kesalahan: $e')));
@@ -115,9 +140,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.person,
                     hint: "Username",
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null || value.isEmpty)
                         return "Username harus diisi";
-                      }
                       return null;
                     },
                   ),
@@ -127,9 +151,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.email,
                     hint: "Email",
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null || value.isEmpty)
                         return "Email harus diisi";
-                      }
                       return null;
                     },
                   ),
@@ -140,9 +163,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: "Kata Sandi",
                     isPassword: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null || value.isEmpty)
                         return "Kata sandi harus diisi";
-                      }
                       return null;
                     },
                   ),
@@ -153,12 +175,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: "Konfirmasi Kata Sandi",
                     isPassword: true,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value == null || value.isEmpty)
                         return "Konfirmasi kata sandi harus diisi";
-                      }
-                      if (value != _passwordController.text) {
-                        return "Kata sandi dan konfirmasi kata sandi tidak sama";
-                      }
+                      if (value != _passwordController.text)
+                        return "Kata sandi tidak cocok";
                       return null;
                     },
                   ),
@@ -167,7 +187,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xff6482AD),
+                        backgroundColor: const Color(0xff6482AD),
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -218,7 +238,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Sudah Punya Akun?",
                           style: TextStyle(
                             color: Colors.black,
@@ -230,11 +250,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LoginScreen(),
+                                builder: (context) => const LoginScreen(),
                               ),
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             "Masuk",
                             style: TextStyle(color: Color(0xff6482AD)),
                           ),

@@ -1,8 +1,8 @@
-// widget/edukasi/article_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:mediquick/admin/model/article_model.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart'; // Tambahkan untuk membuka video YouTube
+import 'package:mediquick/main.dart' as MixpanelManager;
+import 'package:url_launcher/url_launcher.dart';
 
 class ArticleDetailScreen extends StatelessWidget {
   final Article article;
@@ -11,6 +11,17 @@ class ArticleDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Kirim event ke Mixpanel saat artikel dibuka
+    MixpanelManager.mixpanel.track(
+      "View Article Detail",
+      properties: {
+        'article_title': article.title,
+        'article_author': article.author,
+        'has_video': article.videoUrl.isNotEmpty,
+        'published_date': article.publishedDate?.toIso8601String() ?? '',
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(article.title),

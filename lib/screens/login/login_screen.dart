@@ -1,19 +1,16 @@
-// screens/login/login_screen.dart
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:mediquick/admin/admin_dashboard.dart';
 import 'package:mediquick/apotek_role/apotek_dashboard.dart';
+import 'package:mediquick/mixpanel_service.dart';
 import 'package:mediquick/screens/login/forgot_password_screen.dart';
 import 'package:mediquick/screens/navigasi_screen.dart';
 import 'package:mediquick/screens/register/register_screen.dart';
 import 'package:mediquick/service/location_service.dart';
 import 'package:mediquick/widget/login/custom_text_field.dart';
 import 'package:mediquick/widget/login/social_login_button.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,19 +26,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _rememberMe = false;
 
-  void _handleErrorResponse(dynamic data) {
-    final errorMessage =
-        data['message']?.toString() ?? 'Terjadi kesalahan. Silakan coba lagi.';
-    _showErrorSnackbar(errorMessage);
-  }
-
   void _showErrorSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.redAccent,
-        duration: const Duration(seconds: 3),
-      ),
+      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
     );
   }
 
@@ -53,85 +40,36 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString('alamat_user', address);
       await prefs.setDouble('latitude_user', position.latitude);
       await prefs.setDouble('longitude_user', position.longitude);
-
-      print("Alamat tersimpan: \$address");
     } catch (e) {
-      print("Gagal ambil lokasi: \$e");
-    }
-  }
-
-  Future<void> saveAutoDetectedAddress() async {
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      if (placemarks.isNotEmpty) {
-        Placemark p = placemarks.first;
-        String formatted = [
-          p.street,
-          p.subLocality,
-          p.locality,
-          p.administrativeArea,
-          p.postalCode,
-        ].where((e) => e != null && e.isNotEmpty).join(', ');
-
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('auto_address', formatted);
-        await prefs.setString('auto_name', 'Lokasi Saya');
-        await prefs.setString(
-          'auto_phone',
-          '08123456789',
-        ); // optional, bisa diisi user
-      }
-    } catch (e) {
-      debugPrint('Gagal mendeteksi lokasi: $e');
+      print("Gagal ambil lokasi: $e");
     }
   }
 
   Future<void> _validateAndLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-
       try {
-        final response = await http
-            .post(
-              Uri.parse("http://mediquick.my.id/login.php"),
-              headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-              },
-              body: jsonEncode({
-                "email": _emailController.text.trim(),
-                "password": _passwordController.text.trim(),
-              }),
-            )
-            .timeout(const Duration(seconds: 10));
-        print("Raw response body: ${response.body}");
+        final response = await http.post(
+          Uri.parse("http://mediquick.my.id/login.php"),
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: jsonEncode({
+            "email": _emailController.text.trim(),
+            "password": _passwordController.text.trim(),
+          }),
+        );
 
         final dynamic data = jsonDecode(response.body);
-
         if (response.statusCode == 200) {
           await afterLoginSuccess();
           _handleSuccessResponse(data);
         } else {
-          _handleErrorResponse(data);
+          _showErrorSnackbar(data['message'] ?? 'Login gagal.');
         }
-      } on SocketException {
-        _showErrorSnackbar(
-          "Tidak dapat terhubung ke server. Periksa jaringan.",
-        );
-        debugPrint("SocketException: \$e");
-      } on FormatException {
-        _showErrorSnackbar("Format data tidak valid: \${e.message}");
-      } on http.ClientException {
-        _showErrorSnackbar("Gagal terhubung ke server");
       } catch (e) {
-        _showErrorSnackbar("Terjadi kesalahan tak terduga: \$e");
+        _showErrorSnackbar("Kesalahan jaringan: $e");
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -139,34 +77,38 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleSuccessResponse(dynamic data) async {
-    debugPrint("Full API Response: \${data.toString()}");
     try {
       final token = data['token']?.toString();
       final userData = data['data'];
 
-      if (token == null || userData == null) {
-        throw const FormatException("Respon server tidak valid");
-      }
-
-      final requiredFields = ['id', 'email', 'role'];
-      for (final field in requiredFields) {
-        if (userData[field] == null) {
-          throw FormatException("Field \$field tidak ditemukan");
-        }
-      }
-
-      final role = userData['role'].toString().toLowerCase().trim();
-      if (!['admin', 'apotek', 'user'].contains(role)) {
-        throw FormatException("Role tidak valid: \$role");
-      }
-
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token', token);
+      final role = userData['role'].toString().toLowerCase();
+
+      await prefs.setString('token', token ?? '');
       await prefs.setString('userData', jsonEncode(userData));
       await prefs.setString('role', role);
       await prefs.setString('id', userData['id'].toString());
       await prefs.setString('nama', userData['name'].toString());
       await prefs.setString('email', userData['email'].toString());
+
+      /// 🔵 Mixpanel Integration
+      final mixpanel = MixpanelService.instance;
+
+      mixpanel.identify(userData['id'].toString());
+
+      mixpanel.getPeople().set('name', userData['name']);
+      mixpanel.getPeople().set('email', userData['email']);
+      mixpanel.getPeople().set('role', role);
+      mixpanel.getPeople().set('last_login', DateTime.now().toIso8601String());
+
+      mixpanel.track(
+        'User Logged In',
+        properties: {
+          'email': userData['email'],
+          'role': role,
+          'login_time': DateTime.now().toIso8601String(),
+        },
+      );
 
       if (role == 'apotek') {
         final apotekProfileResponse = await http.get(
@@ -174,8 +116,6 @@ class _LoginScreenState extends State<LoginScreen> {
             "http://mediquick.my.id/users/get_apotek_profile.php?user_id=${userData['id']}",
           ),
         );
-
-        debugPrint("RESPON PROFIL APOTEK: ${apotekProfileResponse.body}");
 
         if (apotekProfileResponse.statusCode == 200) {
           final apotekData = jsonDecode(apotekProfileResponse.body);
@@ -188,33 +128,22 @@ class _LoginScreenState extends State<LoginScreen> {
               'apotek_id',
               int.parse(apotekData['apotek_profile_id'].toString()),
             );
-
             await prefs.setString(
               'pharmacy_name',
               apotekData['pharmacy_name'] ?? '',
             );
-            debugPrint(
-              "✅ apotek_profile_id disimpan: ${apotekData['apotek_profile_id']}",
-            );
-          } else {
-            debugPrint(
-              "⚠️ Gagal ambil profil apotek: ${apotekData['message']}",
-            );
           }
-        } else {
-          debugPrint("⚠️ HTTP Error: ${apotekProfileResponse.statusCode}");
         }
       }
 
       _navigateBasedOnRole(role);
     } catch (e) {
-      _showErrorSnackbar(e.toString());
+      _showErrorSnackbar("Gagal login: ${e.toString()}");
       await _clearSession();
     }
   }
 
   void _navigateBasedOnRole(String role) {
-    debugPrint("Role Received: \$role");
     final Map<String, Widget> roleScreens = {
       'admin': const AdminDashboardScreen(),
       'apotek': const ApotekDashboardScreen(),
@@ -231,13 +160,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _clearSession() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -270,7 +192,6 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           "Masuk untuk pengalaman terbaik dengan MediQuick",
           style: TextStyle(
-            fontSize: 14,
             color: Colors.grey[600],
             fontWeight: FontWeight.bold,
           ),
@@ -303,19 +224,6 @@ class _LoginScreenState extends State<LoginScreen> {
         const _RegisterPrompt(),
       ],
     );
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) return "Email harus diisi";
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return "Format email tidak valid";
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) return "Kata sandi harus diisi";
-    return null;
   }
 
   Widget _buildRememberMeSection() {
@@ -360,9 +268,9 @@ class _LoginScreenState extends State<LoginScreen> {
         child: const Text(
           "Masuk",
           style: TextStyle(
+            color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
           ),
         ),
       ),
@@ -375,14 +283,10 @@ class _LoginScreenState extends State<LoginScreen> {
         SocialLoginButton(
           text: "Masuk dengan Google",
           iconPath: "assets/icons/google.png",
-          onPressed: () => _handleSocialLogin('google'),
+          onPressed: () {},
         ),
       ],
     );
-  }
-
-  void _handleSocialLogin(String provider) {
-    // Implement social login logic
   }
 
   Widget _buildLoadingOverlay() {
@@ -390,26 +294,32 @@ class _LoginScreenState extends State<LoginScreen> {
       height: double.infinity,
       width: double.infinity,
       color: Colors.black54,
-      child: Center(
+      child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(
+            CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
-            const SizedBox(height: 20),
-            Text(
-              "Memproses...",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            SizedBox(height: 20),
+            Text("Memproses...", style: TextStyle(color: Colors.white)),
           ],
         ),
       ),
     );
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) return "Email harus diisi";
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+      return "Format email tidak valid";
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return "Kata sandi harus diisi";
+    return null;
   }
 }
 

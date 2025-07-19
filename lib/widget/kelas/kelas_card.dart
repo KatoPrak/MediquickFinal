@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mediquick/main.dart' as MixpanelManager;
 import 'package:mediquick/widget/kelas/kelas_detail_screen.dart';
 
 class ClassCardGrid extends StatelessWidget {
@@ -29,6 +30,14 @@ class ClassCardGrid extends StatelessWidget {
 
         return GestureDetector(
           onTap: () {
+            MixpanelManager.mixpanel.track(
+              "Select Class",
+              properties: {
+                'class_id': moduleId,
+                'class_title': title,
+                'timestamp': DateTime.now().toIso8601String(),
+              },
+            );
             Navigator.push(
               context,
               MaterialPageRoute(

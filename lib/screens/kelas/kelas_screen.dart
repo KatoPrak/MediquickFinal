@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediquick/main.dart' as MixpanelManager;
 import 'package:mediquick/widget/kelas/kelas_card.dart';
 import 'package:mediquick/widget/kelas/kelas_search_bar.dart';
 
@@ -22,6 +23,12 @@ class _KelasScreenState extends State<KelasScreen> {
   void initState() {
     super.initState();
     fetchModules();
+
+    // Track event saat halaman kelas dibuka
+    MixpanelManager.mixpanel.track(
+      "View Class List",
+      properties: {'timestamp': DateTime.now().toIso8601String()},
+    );
   }
 
   Future<void> fetchModules() async {
@@ -42,10 +49,11 @@ class _KelasScreenState extends State<KelasScreen> {
 
   void _onSearchChanged(String query) {
     setState(() {
-      filteredModules = allModules.where((modul) {
-        final title = modul['title']?.toLowerCase() ?? '';
-        return title.contains(query.toLowerCase());
-      }).toList();
+      filteredModules =
+          allModules.where((modul) {
+            final title = modul['title']?.toLowerCase() ?? '';
+            return title.contains(query.toLowerCase());
+          }).toList();
     });
   }
 

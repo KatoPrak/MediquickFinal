@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediquick/main.dart' as MixpanelManager;
 
 class QuizScreen extends StatefulWidget {
   final String moduleId;
@@ -77,6 +78,15 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void showResult() {
+    // Tracking event ke Mixpanel
+    MixpanelManager.mixpanel.track(
+      "Quiz Completed",
+      properties: {
+        "module_id": widget.moduleId,
+        "score": score,
+        "total_questions": quizzes.length,
+      },
+    );
     showDialog(
       context: context,
       barrierDismissible: false,
